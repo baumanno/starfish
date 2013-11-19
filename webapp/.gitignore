@@ -1,0 +1,58 @@
+## generic files to ignore
+#
+*~
+*.lock
+*.DS_STORE
+*.swp
+*.out
+*.backup
+
+# play!-framework-specific directories
+# We don't want the generated content from these:
+logs
+project/project
+project/target
+target
+.target
+tmp
+RUNNING_PID
+conf/evolutions/
+
+## Java-specific files to ignore
+## we dont want class files cluttering the repo
+*.class
+
+## we dont want IDE-specific data cluttering the repo
+#
+# Eclipse:
+.project
+.idea
+*.iml
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# PDT-specific
+.buildpath
+
+# Checkstyle-configfile
+checkstyle.conf
+.checkstyle

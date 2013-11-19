@@ -1,0 +1,275 @@
+@(title: String, nav: String)(content: Html)
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Project starfish | @title </title>
+<link href='@routes.Assets.at("stylesheets/bootstrap.css")' rel="stylesheet"
+  media="screen">
+<link href='@routes.Assets.at("stylesheets/main.css")' rel="stylesheet"
+  media="screen">
+<link href='@routes.Assets.at("images/favicon.ico")' rel="shortcut icon"
+  type="image/ico">
+<script src='@routes.Assets.at("javascripts/jquery-1.9.1.min.js")'
+  type="text/javascript"></script>
+  
+</head>
+
+<body>
+
+  <div class="page-header">
+    <h1>@title</h1>
+  </div>
+
+  <nav>
+    <div>
+      <ul>
+        <li>
+          <a class="brand" href="@routes.Application.index()">Home</a>
+        </li>
+        <li class='@("active".when(nav == "new"))'>
+          New
+          <ul>
+            <li class='@("active".when(nav == "metrics"))'>
+              <a href='@routes.MetricSubmission.blank()'>Metric</a>
+            </li>
+            <li class='@("active".when(nav == "contact"))'>
+              <a href='@routes.FeedSubmission.blank()'>Feed</a>
+            </li>
+            <li class='@("active".when(nav == "contact"))'>
+              <a href='@routes.LinkMetricSubmission.blank()'>Link</a>
+            </li>
+
+          </ul>
+        </li>
+        <li>
+          <a href='@service.routes.Communicator.Topology()'>Discover</a>
+        </li>
+        <li>
+          <a href='@service.routes.Communicator.doWork()'>Apply Configuration</a>
+        </li>
+        <li>
+          <a href='@routes.TracerouteSubmission.blank()'>Traceroute</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <br>
+    @if(title == "Create a feed" || title == "Create a metric") {
+        @content
+    } else {
+        @content
+        <div id="map_canvas" style="width: 960px; height: 500px"></div>       
+    }
+  <br>
+  <br>
+  <br>
+  
+
+
+</body>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADwrT3l8dF4z7KDoMYSjaTKr7G8Hi4srM&sensor=false"></script>
+<script type="text/javascript">
+/*jslint browser: true, devel: true, forin: true, sloppy: true, white: true */
+
+/*properties
+    CIRCLE, InfoWindow, LatLng, Map, MapTypeId, Marker, Point, Polyline, 
+    ROADMAP, Size, SymbolPath, addListener, anchor, center, content, each, 
+    event, fillColor, fillOpacity, get, getElementById, hostname, icon, icons, 
+    latitude, latitudeA, latitudeB, log, longitude, longitudeA, longitudeB, 
+    managementIP, map, mapTypeId, maps, offset, open, parseJSON, path, position, 
+    push, repeat, routingTable, scale, size, strokeColor, strokeOpacity, 
+    strokeWeight, upTime, url, zoom
+*/
+
+
+ function initialize() {
+
+    var circle = { // This is a simple blue dot that is drawn
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: "blue",
+        fillOpacity: 0.7,
+        strokeWeight: 5
+    },
+        router = { // This is a simple router icon
+            anchor: new google.maps.Point(19, 13),
+            url: "/assets/images/generic_router.png",
+            size: new google.maps.Size(38, 26)
+        },
+        mapOptions = {
+            center: new google.maps.LatLng(52.50842,13.386841),
+            zoom: 5,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        },
+        map = new google.maps.Map(
+            document.getElementById("map_canvas"),
+            mapOptions);
+
+    getData('/getVertex', function (data) {
+        console.log(data);
+    });
+
+    getNodeInfo('/getInfos', function (data) {
+        console.log(data);
+    });
+
+    getLink('/getLink', function (link) {
+        console.log(link);
+    });
+
+    getTrLink('/getTraceroute', function (trlink) {
+        console.log(trlink);
+    });
+
+	<!-- Gets JSON Data for markers on Map -->
+    function getData(action, callback) {
+        var markerArray = [],
+            markerData,
+            marker;
+
+        $.get(action, function (response) {
+            var data = $.parseJSON(response),
+                i;
+
+            for(i in data) {
+                markerData = data[i];
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(
+                        markerData.latitude,
+                        markerData.longitude),
+                    icon: router,
+                    map: map
+                });
+                markerArray.push(marker);
+            }
+            callback(markerArray);
+        });
+    }    
+
+	<!-- Gets JSON Data for Node info -->
+    function getNodeInfo(action, callback) {
+        $.get(action, function (response) {
+            var nodeInfo = $.parseJSON(response),
+                nodeInfoArray = [],
+                myLatLng = [],
+                marker = [];
+
+            $.each(nodeInfo, function (i) {
+                var nodeInfoData = nodeInfo[i];
+                myLatLng[i] = new google.maps.LatLng(
+                    nodeInfoData.latitude,
+                    nodeInfoData.longitude);
+
+                marker[i] = new google.maps.Marker({
+                    position: myLatLng[i],
+                    icon: router,
+                    map: map
+                });
+
+                var contentString = String(
+                    "<b>Unique IP:</b>" + nodeInfoData.managementIP +
+                    "<br><b>Hostname:</b>" + nodeInfoData.hostname +
+                    "<br><b>Uptime:</b>" + nodeInfoData.upTime/3600 + "h<br>"),
+                    infowindow = new google.maps.InfoWindow({
+                        content: contentString
+                    });
+
+                google.maps.event.addListener(marker[i], 'click', function () {
+                    infowindow.open(map, marker[i]);
+                });
+            });
+            callback(nodeInfoArray);
+        });
+    }    
+
+	<!-- Draws links between nodes -->
+    function getLink(action, callback) {
+        var linkArray = [],
+            linkData, line, lineCoordinates;
+
+        $.get(action, function (response) {
+            var link = $.parseJSON(response),
+                i;
+
+            for(i in link) {
+                linkData = link[i];
+                lineCoordinates = [
+                    new google.maps.LatLng(
+                        linkData.latitudeA,
+                        linkData.longitudeA),
+                    new google.maps.LatLng(
+                        linkData.latitudeB,
+                        linkData.longitudeB)
+                ];
+                line = new google.maps.Polyline({
+                    path: lineCoordinates,
+                    strokeColor: "#000000",
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2,
+                    map: map
+                });
+
+                google.maps.event.addListener(
+                    line, 'click', function () {
+                    window.open("@routes.LinkMetricSubmission.blank()");
+                });
+
+                linkArray.push(lineCoordinates);
+                console.log(link[i]);
+                console.log(lineCoordinates);
+            }
+        });
+        callback(lineCoordinates);
+    }
+
+	<!-- Draws Traceroute links between nodes -->
+    function getTrLink(action, callback) {
+        var trlinkData, trlineCoordinates = [],
+            trlineSymbol, trline, linkArray = [];
+
+        $.get(action, function (response) {
+            var trlink = $.parseJSON(response),
+                i;
+
+            for(i in trlink) {
+                trlinkData = trlink[i];
+                trlineCoordinates = [
+                    new google.maps.LatLng(
+                        trlinkData.latitudeA,
+                        trlinkData.longitudeA),
+                    new google.maps.LatLng(
+                        trlinkData.latitudeB,
+                        trlinkData.longitudeB)
+                ];
+                trlineSymbol = {
+                    path: 'M 0,-1 0,1',
+                    strokeColor: "#FF0000",
+                    strokeOpacity: 1,
+                    scale: 4
+                };
+                trline = new google.maps.Polyline({
+                    path: trlineCoordinates,
+                    strokeOpacity: 0,
+                    strokeWeight: '15',
+                    icons: [{
+                            icon: trlineSymbol,
+                            offset: '0',
+                            repeat: '5px'
+                        }
+                    ],
+                    map: map
+                });
+
+                linkArray.push(trlineCoordinates);
+                console.log(trlink[i]);
+                console.log(trlineCoordinates);
+            }
+
+        });
+        callback(trlineCoordinates);
+    }    
+}
+initialize();
+</script>
+</html>

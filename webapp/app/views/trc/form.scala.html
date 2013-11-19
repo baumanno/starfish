@@ -1,0 +1,38 @@
+@(trcSubmitForm: Form[Trc])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@main("Run Traceroute", "trcSet") {
+    
+    @helper.form(action = routes.TracerouteSubmission.submit) {
+        
+        <fieldset>
+            <legend>Specify route</legend>
+            
+            @inputText(
+                trcSubmitForm("from"), 
+                '_help -> "Please choose the source.",
+                '_error -> trcSubmitForm.globalError,
+                'placeholder -> "Source"
+            )
+            
+          	 @inputText(
+                trcSubmitForm("to"), 
+                '_help -> "Please choose the destination",
+                '_error -> trcSubmitForm.globalError,
+                'placeholder -> "Destination"
+            )
+            
+        </fieldset>
+        
+        
+        
+        
+        <div class="actions">
+            <input type="submit" class="btn primary" value="Trace!">
+            <a href="@routes.Application.index" class="btn">Reset</a>
+        </div>
+        
+    }}
+    

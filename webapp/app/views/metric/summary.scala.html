@@ -1,0 +1,13 @@
+@(metric: Metric)
+
+@main("Metric created!", "metrics") {
+    
+    <div id=status><p><b>Status Box</b></p>
+   <p>Created Metric:</p> 
+   Metric Name: <p>@metric.getName</p>
+   Unit Name: <p>@metric.getUnit()</p>
+   Default Unit: <p>@metric.getDefaultValue()</p>
+   </div>
+   <br/>
+
+}

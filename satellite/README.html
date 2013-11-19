@@ -1,0 +1,160 @@
+<h2>README</h2>
+
+<p>Dawin Schmidt, <a href="&#x6D;&#x61;&#x69;&#108;&#116;&#111;:&#100;&#97;&#119;&#105;&#x6E;&#x2E;&#x73;&#99;&#104;&#x6D;&#x69;&#x64;&#x74;&#64;&#x63;&#x61;&#109;&#x70;&#117;&#115;&#x2E;&#x6C;m&#x75;&#46;&#x64;&#101;">&#100;&#97;&#119;&#105;&#x6E;&#x2E;&#x73;&#99;&#104;&#x6D;&#x69;&#x64;&#x74;&#64;&#x63;&#x61;&#109;&#x70;&#117;&#115;&#x2E;&#x6C;m&#x75;&#46;&#x64;&#101;</a></p>
+
+<p>Munich (GER), 10-25-2013</p>
+
+<h3>Introduction</h3>
+
+<p>The development of this application was part of a semester project at the University of Munich. </p>
+
+<p>It uses Cisco's onePK-SDK to discover a network's topology and to set static routes on Cisco routers. 
+Furthermore it's accessible remotely (in this project through a web application) and can call
+remote procedure via Java RMI. See a example call chain below:</p>
+
+<pre><code>        RMI-Call           getTopology()
+WebAPP  -------&gt; Satellite ------------&gt; CiscoAgent
+        RMI-Call           sendEvent()
+        &lt;-------           &lt;------------
+</code></pre>
+
+<h3>Development Environment</h3>
+
+<p>This development environment consists of following files and folders:</p>
+
+<p><strong>src/main/java/de/lmu/ifi/nm/www</strong></p>
+
+<ul>
+<li>CiscoAgent.java - Implements INetworkAgent interface. Talks to Cisco devices via onePK-API.</li>
+<li>INetworkAgent.java - Defines a network agent. Implementation of a HP/Juniper/... Agent possible.</li>
+<li>Satellite.java - (Cisco)Agent controller. Connected to WebApp-Server via Java RMI.</li>
+<li>ISatellite.java - The remote interface for Satellite.java.</li>
+</ul>
+
+<p><strong>src/main/resources</strong></p>
+
+<ul>
+<li>connection.properties - You need to adjust connection parameters in this file.</li>
+<li>log4j.properties - Modify log4j parameters to your needs.</li>
+</ul>
+
+<p><strong>src/test</strong> - Directory for JUnit tests.</p>
+
+<p><strong>doc</strong> - Contains the Java-Doc of this application.</p>
+
+<p><strong>lib</strong> - Contains libraries necessary for this application.</p>
+
+<p><strong>pom.xml</strong> - All Maven related commands need to be executed in the directory with the pom.xml.</p>
+
+<h3>Requisites</h3>
+
+<ol>
+<li>Obtain Cisco's onePK SDK version 0.6.0.5 from <a href="http://developer.cisco.com">here</a> and copy "libonep-core-rel-0.6.0.5.jar" to the lib directory. Due to license issues the library has been removed from this package. </li>
+<li>This application will be build using Maven. Maven needs an internet connection to download required dependencies. If your environment does not allow for external connections, you could configure Maven to run offline. Also see <a href="http://stackoverflow.com/questions/7233328/how-do-i-configure-maven-for-offline-development">this link</a>.</li>
+<li>Make sure CDP is enabled on every single Cisco router in your network (necessary for topology discovery).</li>
+<li>For onePK API-call authorization configure the same unsername and password on every device.</li>
+<li>Make sure that ports configured in connection.properties file or passed as arguments aren't blocked by your firewall.</li>
+<li>Test this application in a lab environment <strong>only</strong>: so far this program has been tested just with virtual network hardware; furthermore onePK API and- Java RMI calls aren't encrypted. <strong>User credentials are being transmitted in clear text!</strong></li>
+</ol>
+
+<h3>Set up environment</h3>
+
+<ol>
+<li>Install Maven. You may obtain it from <a href="http://maven.apache.org/download.html">here</a>.</li>
+<li>You may edit pom.xml to set your Java version: build --> plugins --> plugin --> configuration: edit <em>source</em> and <em>target</em>.</li>
+<li>Modify <em>./src/main/resources/connection.properties</em> file to your needs. Make sure ports aren't blocked by your firewall.</li>
+</ol>
+
+<h3>Install third-party libraries</h3>
+
+<ol>
+<li><p>onePK libraries:</p>
+
+<pre><code>cd ./lib
+mvn install:install-file -Dfile=libonep-core-rel-0.6.0.5.jar -DgroupId=com.cisco.onep -DartifactId=libonep-core-rel -Dversion=0.6.0.5 -Dpackaging=jar
+</code></pre></li>
+<li><p>RMI server interface:</p>
+
+<pre><code>mvn install:install-file -Dfile=topodisinf.jar -DgroupId=de.lmu.ifi.nm.www -DartifactId=topodisinf -Dversion=0.0.1 -Dpackaging=jar
+</code></pre></li>
+</ol>
+
+<h3>How to compile</h3>
+
+<p>Make sure you are in the root directory with the pom.xml file. Now compile using the following Maven commands:</p>
+
+<pre><code>1. mvn clean
+2. mvn compile
+</code></pre>
+
+<h3>How to run</h3>
+
+<p>Make sure you have compiled the application and are in the root directory with the <strong>pom.xml</strong> file. Choose one of the following methods to run the program:</p>
+
+<ol>
+<li><p>Using Maven reading parameters from <em>connnection.properties</em>:</p>
+
+<pre><code>mvn exec:java -Dexec.mainClass=de.lmu.ifi.nm.www.Satellite -Dexec.keepAlive=true
+</code></pre></li>
+<li><p>Using Maven with arguments:</p>
+
+<pre><code>mvn exec:java -Dexec.mainClass=de.lmu.ifi.nm.www.Satellite -Dexec.args="-sn &lt;Satellite name&gt; -si &lt;Satellite IP addr&gt; -sp &lt;Satellite port number&gt; -ti &lt;TopologyDiscoverer IP addr&gt; -tp &lt;TopologyDiscoverer port number&gt; -a &lt;root element addr&gt; -u &lt;root element username&gt; -p &lt;root element password&gt;" -Dexec.keepAlive=true
+</code></pre></li>
+<li><p>Using Java command line reading from <em>connnection.properties</em>:</p>
+
+<pre><code>cd target/classes
+java -cp '.:../../lib/*' de.lmu.ifi.nm.www.Satellite
+</code></pre></li>
+<li><p>Using Java command line with arguments:</p>
+
+<pre><code>cd target/classes
+java -cp '.:../../lib/*' de.lmu.ifi.nm.www.Satellite -sn &lt;Satellite name&gt; -si &lt;Satellite IP addr&gt; -sp &lt;Satellite port number&gt; -ti &lt;TopologyDiscoverer IP addr&gt; -tp &lt;TopologyDiscoverer port number&gt; -a &lt;root element addr&gt; -u &lt;root element username&gt; -p &lt;root element password&gt;
+</code></pre></li>
+</ol>
+
+<h3>Possible features in a future release</h3>
+
+<ol>
+<li>SSL support: RMI and onePK API calls</li>
+<li>Automate network discovery (PUSH communication):
+<ul><li>Satellites connect to TopologyDiscoverer; if there's a connection timeout quit the Satellite</li>
+<li>Satellites initialize their Network Agents</li>
+<li>During initialization Agents start network discovery and send topology graph to their corresponding Satellite</li>
+<li>Satellites send graph to TopologyDiscoverer which would then merge all graphs received</li></ul></li>
+<li>Add discovery scope for Network Agent
+<ul><li>How could a scope look like? Subnet, network class (A, B, C), stop after router Z, CIDR notation, list of IP-Addresses ...</li></ul></li>
+<li>Own thread per Network Agent to speed up network discovery. Issues?</li>
+<li>Proper error handling</li>
+<li>Java RMI performance boost</li>
+<li>Improve event handling: What's happening if a router goes down?</li>
+<li>Add communication between Satellites</li>
+<li>Add a routing table parser</li>
+<li>Add traceroute support</li>
+<li>GeoLocation feature (Pkg com.cisco.onep.location) wasn't available in the current onePK-SDK release, therefore GPS coordinates of network elements have been hard coded.  Add method to read coordinates from Cisco devices.</li>
+<li>Change topology discovery to use OSPF protocol rather than CDP</li>
+</ol>
+
+<h3>Known bugs</h3>
+
+<ul>
+<li>CiscoAgent.java: 
+<ul><li>toJGraphT() --> in some cases proprietary CDP graph and JGraphT-Graph aren't equal</li></ul></li>
+</ul>
+
+<h3>Lab configuration</h3>
+
+<ul>
+<li>onePK-SDK 0.6.0.5</li>
+<li>Java 7 Update 25</li>
+<li>Apache Maven 3.0.4</li>
+<li>OS: Ubuntu 12.10</li>
+<li>Kernel: 3.5.0-27-generic</li>
+<li>Architecture: amd64</li>
+</ul>
+
+<h3>More information and contact</h3>
+
+<ul>
+<li>Development Team:
+<a href="&#109;&#x61;&#105;&#x6C;&#x74;&#x6F;:&#112;&#114;&#x6F;je&#x63;&#116;&#45;&#115;&#116;&#97;&#114;&#x66;&#x69;&#115;&#x68;&#64;&#x67;&#x6F;&#x6F;&#103;&#x6C;&#x65;&#103;&#114;&#111;&#117;&#x70;&#115;&#x2E;&#x63;&#111;&#x6D;">&#112;&#114;&#x6F;je&#x63;&#116;&#45;&#115;&#116;&#97;&#114;&#x66;&#x69;&#115;&#x68;&#64;&#x67;&#x6F;&#x6F;&#103;&#x6C;&#x65;&#103;&#114;&#111;&#117;&#x70;&#115;&#x2E;&#x63;&#111;&#x6D;</a></li>
+</ul>

@@ -1,0 +1,75 @@
+@(linkMetricSubmitForm: Form[LinkToMetric])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@main("Configure link", nav = "linkToMetrics") {
+    
+    @helper.form(action = routes.LinkMetricSubmission.submit()) {
+        
+        <fieldset>
+            <legend>Configure an existing link</legend>
+            
+            @inputText(
+                linkMetricSubmitForm("start"), 
+                '_help -> "Please choose the hostname of the starting-point.",
+                '_error -> linkMetricSubmitForm.globalError,
+                'placeholder -> "Start of the link"
+            )
+            
+            <img src="/assets/images/switch.png" alt="img_switch"
+              class="switcher" title="Switch the inputs">
+       
+          	 @inputText(
+                linkMetricSubmitForm("end"), 
+                '_help -> "Please choose the hostname of the end-point.",
+                '_error -> linkMetricSubmitForm.globalError,
+                'placeholder -> "End of the link"
+            )
+            
+            @select(
+                linkMetricSubmitForm("MName"),
+                options = options(controllers.service.Communicator.getAllMetrics),
+                '_default -> "Please choose a metric",
+                '_help -> "Assign a metric to the link",
+                '_error -> linkMetricSubmitForm.globalError
+                )
+                
+            @select(
+                linkMetricSubmitForm("FName"),
+                options = options(controllers.service.Communicator.getAllFeeds),
+                '_default -> "Please choose a feed",
+                '_help -> "Assign a feed to the link",
+                '_error -> linkMetricSubmitForm.globalError
+                )
+            
+           <script>
+   			function switchStartEnd ()
+         		{
+         			var temp = $('#start').val();
+					$('#start').val($('#end').val());
+					$('#end').val(temp);
+         		}
+         
+         	$('document').ready(function() {
+         	$('.switcher').click(function() {
+         		switchStartEnd();
+         	});
+         });
+         </script>   
+   </div>
+            
+        </fieldset>
+        
+        
+        
+        
+        <div class="actions">
+            <input type="submit" class="btn primary" value="Save">
+            <a href="@routes.Application.index" class="btn">Reset</a>
+        </div>
+        
+    }
+ 
+    
+}

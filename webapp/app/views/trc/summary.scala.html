@@ -1,0 +1,11 @@
+@(trc: Trc)
+
+@main("Route has been traced", "metrics") {
+    
+    <div id=status><p><b>Status Box</b></p>
+   <p>Your Traceroute:</p> 
+   Start Node: <p>@trc.getFrom()</p>
+   Unit Name: <p>@trc.getTo()</p>
+   </div>
+   <br/>   
+}

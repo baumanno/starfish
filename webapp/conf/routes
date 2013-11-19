@@ -1,0 +1,35 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET    /getTopo         controllers.service.Communicator.Topology()
+GET    /                controllers.Application.index()         
+
+# Signup
+GET    /metrics         controllers.MetricSubmission.blank()
+POST   /metrics         controllers.MetricSubmission.submit()
+
+# Feeds
+GET    /feeds           controllers.FeedSubmission.blank() 
+POST   /feeds           controllers.FeedSubmission.submit()
+
+# Traceroutes
+GET    /traceroute           controllers.TracerouteSubmission.blank() 
+POST   /traceroute           controllers.TracerouteSubmission.submit()
+
+GET    /doWork          controllers.service.Communicator.doWork()
+
+# Map static resources from the /public folder to the /assets URL path
+GET    /assets/*file    controllers.Assets.at(path="/public", file)
+
+GET    /getVertex       controllers.service.Communicator.getAllVertexes()
+GET    /getLink         controllers.service.Communicator.getLink()
+GET    /getInfos        controllers.service.Communicator.getAllInfos()
+GET	   /getTraceroute	controllers.service.Communicator.getTracerouteLink()
+
+
+
+# LinkMetric
+GET    /linkmetric      controllers.LinkMetricSubmission.blank()
+POST   /linkmetric      controllers.LinkMetricSubmission.submit()

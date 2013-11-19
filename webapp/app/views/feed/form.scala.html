@@ -1,0 +1,72 @@
+@(feedForm: Form[Feed])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@main("Create a feed","feed") {
+    
+    @if(feedForm.hasErrors) {
+        <div class="alert-message error">
+            <p><strong>Oops</strong> Please fix all errors</p>
+        </div>
+    }
+    
+    @helper.form(action = routes.FeedSubmission.submit, 'id -> "form") {
+        
+        <fieldset>
+            <legend>Create a new feed</legend>    
+           @inputText(
+                feedForm("name"), 
+                '_help -> "Please choose a unique name.",
+                '_error -> feedForm.globalError,
+                'placeholder -> "Name"
+            )
+           
+           @inputText(
+                feedForm("url"),
+                '_help -> "Please choose a valid URL.",
+                '_error -> feedForm.globalError,
+                'placeholder -> "URL"
+            )
+
+           @inputText(
+                feedForm("user"),
+                '_help -> "Please enter the username.",
+                '_error -> feedForm.globalError,
+                'placeholder -> "Username"
+            )
+
+           @inputText(
+                feedForm("pass"), 
+                '_help -> "Please enter the password.",
+                '_error -> feedForm.globalError,
+                'placeholder -> "Password"
+            )
+            
+           @inputText(
+                feedForm("xPath"), 
+                '_help -> "Please specify a valid XPath.",
+                '_error -> feedForm.globalError,
+                'placeholder -> "XPath"
+            )
+        </fieldset>
+<div class="actions">
+        <input type="submit" class="btn primary" value="Save">
+        <a href="@routes.Application.index" class="btn">Reset</a>
+    </div>                    
+    }
+    
+    <script type="text/javascript" charset="utf-8">     
+        $(document).ready(function() {
+            $("#url").bind('input', function() {
+                if ($("#url").val().toLowerCase().indexOf("https") !== -1) {
+                    $("#pass_field").show(500);
+                    $("#user_field").show(500);
+                } else {
+                    $("#pass_field").hide(500);
+                    $("#user_field").hide(500);
+                }
+            });
+        });        
+    </script>       
+}

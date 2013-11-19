@@ -1,0 +1,14 @@
+@(feed: Feed) 
+
+@main("New Feed created!", "contact") {
+    
+    
+   <div id=status><p><b>Status Box</b></p>
+   <p>Created Feed:</p> 
+   Name: <p>@feed.getName()</p>
+   URL: <p>@feed.getUrl()</p>
+   XPath: <p>@feed.getXPath()</p>
+   </div>
+   <br/>
+    
+}

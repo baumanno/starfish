@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+	
+	<style type="text/css">
+	#user, #pass {
+	   display: none;
+	}
+	</style>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+	<script>       
+	$(document).ready(function () {
+	    $("#url").bind('input', function() {
+	    	if ($("#url").val().toLowerCase().indexOf("https") !== -1) {
+                $("#pass").show(800);
+                $("#user").show(800);
+            }
+	    });
+	});
+
+    </script>
+	
+</head>
+<body>
+    <div id="url-form">
+	   <form action="#">
+	       <input type="text" id="url" value="Please enter a URL">
+	       <br>
+		   <input type="text" id="user" value="Please enter a username">
+		   <br>
+		   <input type="text" id="pass" value="Please enter a password">		   
+		</form>
+	</div>
+</body>
+</html>

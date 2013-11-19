@@ -1,0 +1,13 @@
+@(linkToMetric: LinkToMetric)
+
+@main("Relation created!", "metrics") {
+    
+    <div id=status><p><b>Status Box</b></p>
+   <p>Created Relation:</p> 
+   From Node: <p>@linkToMetric.getStart()</p>
+   To Node: <p>@linkToMetric.getEnd()</p>
+   With Metric: <p>@linkToMetric.getMName()</p>
+   Is this Feed: <p>@linkToMetric.getFName()</p>
+   </div>
+   <br/>
+}

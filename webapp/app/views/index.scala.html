@@ -1,0 +1,12 @@
+@main("Welcome!", "") {
+    <article>
+        This is the dashboard. Here, you see your topology
+        and have access to all functions.<br>
+        We suggest you
+        <a href='@controllers.service.routes.Communicator.Topology()'>fetch the topology first</a>,
+        and then <a href='@controllers.routes.MetricSubmission.blank()'>create some metrics</a> and
+        <a href='@controllers.routes.FeedSubmission.blank()'>feeds</a>.
+        <br>
+    </article>    	  	        
+    <br>
+}

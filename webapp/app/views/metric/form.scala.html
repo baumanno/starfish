@@ -1,0 +1,44 @@
+@(metricSubmitForm: Form[Metric])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@main("Create a metric", "metrics") {
+    
+    @helper.form(action = routes.MetricSubmission.submit) {
+        
+        <fieldset>
+            <legend>Create a new metric</legend>
+            
+            @inputText(
+                metricSubmitForm("name"), 
+                '_help -> "Please choose a unique name.",
+                '_error -> metricSubmitForm.globalError,
+                'placeholder -> "Name"
+            )
+            
+          	 @inputText(
+                metricSubmitForm("unit"), 
+                '_help -> "Please choose a unit.",
+                '_error -> metricSubmitForm.globalError,
+                'placeholder -> "Unit"
+            )
+            
+             @inputText(
+                metricSubmitForm("defaultValue"), 
+                '_help -> "This value is used if there is no feed assigned to the link",
+                '_error -> metricSubmitForm.globalError,
+                'placeholder -> "Default value"
+            )
+            
+        </fieldset>
+        
+        
+        <div class="actions">
+            <input type="submit" class="btn primary" value="Save">
+            <a href="@routes.Application.index" class="btn">Reset</a>
+        </div>
+        
+    }
+    
+}
